@@ -38,6 +38,45 @@ class Course(models.Model):
         verbose_name_plural = 'Cursos'
         ordering = ['name']
 
+# Classe para as aulas do curso 
+class Lesson(models.Model):
+    name = models.CharField('Nome', max_length=100)
+    descrition = models.TextField('Descrição', blank=True)
+    number = models.IntegerField('Número (ordem)', blank=True, default=0)
+    release_date = models.DateField('Data de liberação', blank=True, null=True)
+    course = models.ForeignKey(Course, verbose_name='Curso', related_name='lessons', on_delete=models.CASCADE)
+    created_at = models.DateTimeField('Criado em', auto_now_add=True)
+    updated_at = models.DateTimeField('Atualizado em', auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name =  'Aula'
+        verbose_name_plural = 'Aulas'
+        ordering = ['number']
+
+# Classe para os materiais das aulas do curso 
+class Material(models.Model):
+    name = models.CharField('Nome', max_length=100)
+    embedded = models.TextField('Vídeo embedded', blank=True)
+    file = models.FileField(upload_to='lessons/materials', blank=True, null=True)
+    lesson = models.ForeignKey(Lesson, verbose_name='Aula', related_name='materials', on_delete=models.CASCADE)
+    created_at = models.DateTimeField('Criado em', auto_now_add=True)
+    updated_at = models.DateTimeField('Atualizado em', auto_now=True)
+
+    def is_embedded(self):
+        return bool(self.embedded)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name =  'Material'
+        verbose_name_plural = 'Materiais'
+        ordering = ['number']
+
+
 # Classe para inscrição de usuários nos cursos
 class Enrollment(models.Model):
     STATUS_CHOICE = (
