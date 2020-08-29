@@ -74,7 +74,6 @@ class Material(models.Model):
     class Meta:
         verbose_name =  'Material'
         verbose_name_plural = 'Materiais'
-        ordering = ['number']
 
 
 # Classe para inscrição de usuários nos cursos
