@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 from simplemooc.core.mail import send_mail_template
 
@@ -28,6 +29,11 @@ class Course(models.Model):
     def __str__(self):
         return self.name
 
+    # Busca as aulas disponíveis considerando a data atual
+    def release_lessons(self):
+        today = timezone.now().date()
+        return self.lessons.filter(release_date__gte=today)
+
     def get_absolute_url(self):
         return self.slug
         #return self.pk # Caso a link de url do curso esteja usando o código do curso e não a descrição
@@ -41,7 +47,7 @@ class Course(models.Model):
 # Classe para as aulas do curso 
 class Lesson(models.Model):
     name = models.CharField('Nome', max_length=100)
-    descrition = models.TextField('Descrição', blank=True)
+    description = models.TextField('Descrição', blank=True)
     number = models.IntegerField('Número (ordem)', blank=True, default=0)
     release_date = models.DateField('Data de liberação', blank=True, null=True)
     course = models.ForeignKey(Course, verbose_name='Curso', related_name='lessons', on_delete=models.CASCADE)
@@ -50,6 +56,13 @@ class Lesson(models.Model):
 
     def __str__(self):
         return self.name
+
+    # Método para verificar se a aula já está disponível de acordo com a data de lançamento
+    def is_available(self):
+        if self.release_date:
+            today = timezone.now().date()
+            return self.release_date >= today
+        return False
 
     class Meta:
         verbose_name =  'Aula'
